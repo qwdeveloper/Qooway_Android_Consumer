@@ -21,8 +21,14 @@
     
 	<style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:background">@color/Blue</item>
+  		<item name="android:titleTextStyle">@style/MyTheme.ActionBar.TitleTextStyle</item>
     </style>
     
+
+  <style name="MyTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+    <item name="android:textColor">@color/White</item>
+  </style>
+	 
  <color name="Blue">#242A34</color> 
  <color name="Red">#DA563F</color> 
  <color name="Orange">#F29E37</color>
@@ -108,6 +114,7 @@
  <color name="DarkGray">#A9A9A9</color>
  <color name="Brown">#A52A2A</color>
  <color name="Sienna">#A0522D</color>
+ 
  <color name="YellowGreen">#9ACD32</color>
  <color name="DarkOrchid">#9932CC</color>
  <color name="PaleGreen">#98FB98</color>
@@ -121,7 +128,7 @@
  <color name="BlueViolet">#8A2BE2</color>
  <color name="LightSkyBlue">#87CEFA</color>
  <color name="SkyBlue">#87CEEB</color>
- <color name="Gray">#808080</color>
+ <color name="Gray">#CFCFCF</color>
  <color name="Olive">#808000</color>
  <color name="Purple">#800080</color>
  <color name="Maroon">#800000</color>
