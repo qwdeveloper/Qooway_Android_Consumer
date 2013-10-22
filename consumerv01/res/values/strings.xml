@@ -15,13 +15,14 @@
 	<string name="action_search">search</string>
 	<string name="action_category">category</string>
 	<string name="action_more">more</string>
+	<string name="sign_up">Sign up to start getting deals here! Its free</string>
 	
 	 <string-array name="menu_item">
         <item>Login</item>
         <item>Home</item>
         <item>Search</item>
         <item>Category</item>
-        <item>Nearby</item>
+        <item>Near By</item>
         <item>All Deals</item>
         <item>Check In</item>
         <item>Vouchers</item>
@@ -30,19 +31,19 @@
     </string-array>
     
 	<string-array name="menu_item_image_name">
-        <item>menu_login.png</item>
-        <item>menu_home.png</item>
-        <item>menu_search.png</item>
-        <item>menu_categories.png</item>
-        <item>menu_nearby.png</item>
-        <item>menu_menu_all_deals.png</item>
-        <item>menu_checkins.png</item>
-        <item>menu_vouchers.png</item>
-        <item>menu_stamps.png</item>
-        <item>menu_qoopons.png</item>
+        <item>menu_login</item>
+        <item>menu_home</item>
+        <item>menu_search</item>
+        <item>menu_categories</item>
+        <item>menu_nearby</item>
+        <item>menu_all_deals</item>
+        <item>menu_checkins</item>
+        <item>menu_vouchers</item>
+        <item>menu_stamps</item>
+        <item>menu_qoopons</item>
     </string-array>
     
-	     <string name="drawer_open">Open navigation drawer</string>
+	<string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>

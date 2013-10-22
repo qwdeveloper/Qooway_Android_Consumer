@@ -1,6 +1,7 @@
-package com.example.consumerv01;
+package com.example.consumerv01.Drawer;
 
 import android.content.Context;
+
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,13 +13,16 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ItemAdapter extends ArrayAdapter<String> {
+import com.example.consumerv01.R;
+import com.example.consumerv01.R.id;
+
+public class DrawerItemAdapter extends ArrayAdapter<String> {
 
     private final Context context;
     private final String[] Ids;
     private final int rowResourceId;
 
-    public ItemAdapter(Context context, int textViewResourceId, String[] objects) {
+    public DrawerItemAdapter(Context context, int textViewResourceId, String[] objects) {
 
         super(context, textViewResourceId, objects);
 
@@ -38,9 +42,9 @@ public class ItemAdapter extends ArrayAdapter<String> {
         TextView textView = (TextView) rowView.findViewById(R.id.menuText);
 
         int id = Integer.parseInt(Ids[position]);
-        String imageFile = ModelItemAdapter.GetbyId(id).IconFile;
+        String imageFile = DrawerModelAdapter.GetbyId(id).IconFile;
 
-        textView.setText(ModelItemAdapter.GetbyId(id).Name);
+        textView.setText(DrawerModelAdapter.GetbyId(id).Name);
         // get input stream
         InputStream ims = null;
         try {
@@ -48,10 +52,9 @@ public class ItemAdapter extends ArrayAdapter<String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // load image as Drawable
-        Drawable d = Drawable.createFromStream(ims, null);
-        // set image to ImageView
-        imageView.setImageDrawable(d);
+ 
+        imageView.setBackgroundResource(context.getResources().getIdentifier(imageFile,
+                "drawable", context.getPackageName()));
         return rowView;
 
     }

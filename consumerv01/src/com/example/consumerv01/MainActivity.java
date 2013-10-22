@@ -2,9 +2,9 @@ package com.example.consumerv01;
 
 import java.util.Locale;
 
-import com.example.consumerv01.ItemAdapter;
-import com.example.consumerv01.ModelItemAdapter;
 import com.example.consumerv01.R;
+import com.example.consumerv01.Drawer.DrawerItemAdapter;
+import com.example.consumerv01.Drawer.DrawerModelAdapter;
 import com.example.consumerv01.R.color;
 
 import android.app.Activity;
@@ -50,19 +50,19 @@ public class MainActivity extends Activity {
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
        // mDrawerList.setBackgroundColor(color.Red);
        // mDrawerLayout
-       // mDrawerLayout.setDrawerShadow(color.Dar, GravityCompat.START);
+        mDrawerLayout.setDrawerShadow(color.DarkGray, GravityCompat.START);
         // set up the drawer's list view with items and click listener
         String[] mMenuItem = getResources().getStringArray(R.array.menu_item);
         String[] mMenuItemFiles = getResources().getStringArray(R.array.menu_item_image_name);
         
-        ModelItemAdapter.LoadModel(mMenuItem , mMenuItemFiles );
-        String[] ids = new String[ModelItemAdapter.Items.size()];
+        DrawerModelAdapter.LoadModel(mMenuItem , mMenuItemFiles );
+        String[] ids = new String[DrawerModelAdapter.Items.size()];
         for (int i= 0; i < ids.length; i++){
 
             ids[i] = Integer.toString(i+1);
         }
 
-        ItemAdapter adapter = new ItemAdapter(this,R.layout.drawer_list_item, ids);
+        DrawerItemAdapter adapter = new DrawerItemAdapter(this,R.layout.drawer_list_item, ids);
         mDrawerList.setAdapter(adapter);
         
         
@@ -155,9 +155,9 @@ public class MainActivity extends Activity {
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
-        Fragment fragment = new PlanetFragment();
+        Fragment fragment = new PageFragment();
         Bundle args = new Bundle();
-        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+        args.putInt(PageFragment.ARG_PLANET_NUMBER, position);
         fragment.setArguments(args);
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -197,10 +197,10 @@ public class MainActivity extends Activity {
     /**
      * Fragment that appears in the "content_frame", shows a planet
      */
-    public static class PlanetFragment extends Fragment {
+    public static class PageFragment extends Fragment {
         public static final String ARG_PLANET_NUMBER = "planet_number";
 
-        public PlanetFragment() {
+        public PageFragment() {
             // Empty constructor required for fragment subclasses
         }
 
@@ -210,20 +210,28 @@ public class MainActivity extends Activity {
             
             int i = getArguments().getInt(ARG_PLANET_NUMBER);
             String menuItem= getResources().getStringArray(R.array.menu_item)[i];
-            
-            if(menuItem.equals("Login"))
-            {
-            	
-            	return inflater.inflate(R.layout.fragment_login, container, false);
-            }
-            else
-            {
-            	return inflater.inflate(R.layout.fragment_planet, container, false);
-            }
+            menuItem = menuItem.replace(" ", "");
+            FragmentName name = FragmentName.valueOf(menuItem);
+            	switch (name) {
+                case Login:  return inflater.inflate(R.layout.fragment_login, container, false);
+                case NearBy:  return inflater.inflate(R.layout.fragment_nearby, container, false);
 
- 
-        
+                default: return inflater.inflate(R.layout.fragment_none, container, false);
+            	}
     }
 }
-    
+    public enum FragmentName {
+
+         Login,
+         Home,
+         Search,
+         Category,
+         NearBy,
+         AllDeals,
+         CheckIn,
+         Vouchers,
+         Stamps,
+         Qoopons,
+
+      }
 }
