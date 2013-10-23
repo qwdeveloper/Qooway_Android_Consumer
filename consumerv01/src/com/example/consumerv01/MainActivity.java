@@ -2,11 +2,13 @@ package com.example.consumerv01;
 
 import java.util.Locale;
 
+
 import com.example.consumerv01.R;
 import com.example.consumerv01.Drawer.DrawerItemAdapter;
 import com.example.consumerv01.Drawer.DrawerModelAdapter;
 import com.example.consumerv01.R.color;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -43,7 +45,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+//        getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); 
+//        getActionBar().setCustomView(R.layout.action_bar);
         mTitle = mDrawerTitle = getTitle();
         mPlanetTitles = getResources().getStringArray(R.array.menu_item);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -95,6 +98,7 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState == null) {
             selectItem(0);
+            
         }
     }
 
@@ -105,7 +109,7 @@ public class MainActivity extends Activity {
 		SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 		searchView.setQueryHint(getString(R.string.query_hint));
 		int searchPlateId = searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
-        // Getting the 'search_plate' LinearLayout.
+       //  Getting the 'search_plate' LinearLayout.
         View searchPlate = searchView.findViewById(searchPlateId);
         searchPlate.setBackgroundResource(R.drawable.searchbar);
         return super.onCreateOptionsMenu(menu);

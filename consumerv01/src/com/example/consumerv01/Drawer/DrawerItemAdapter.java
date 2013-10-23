@@ -1,8 +1,6 @@
 package com.example.consumerv01.Drawer;
 
 import android.content.Context;
-
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.example.consumerv01.R;
-import com.example.consumerv01.R.id;
+
 
 public class DrawerItemAdapter extends ArrayAdapter<String> {
 
