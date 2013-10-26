@@ -8,7 +8,10 @@
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+
+
+    </FrameLayout>
     <!-- The navigation drawer -->
 
     <ListView
@@ -19,5 +22,7 @@
         android:background="@color/DarkGray"
         android:choiceMode="singleChoice"
         android:dividerHeight="1dp" />
+    
+
 
 </android.support.v4.widget.DrawerLayout>
