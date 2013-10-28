@@ -18,8 +18,11 @@ import com.example.consumerv01.R;
 import com.example.consumerv01.Drawer.DrawerItemAdapter;
 import com.example.consumerv01.Drawer.DrawerModelAdapter;
 import com.example.consumerv01.R.color;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import NearBy.NearByItemAdapter;
+import NearBy.NearByModelAdapter;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -63,7 +66,7 @@ public class MainActivity extends Activity {
 	private String stringUrl = serverUrl + "/" + APIUrl;
 	//private String stringUrl = "http://weather.yahooapis.com/forecastrss?w=Canada";
 	private TextView displayText;
-	private List<Entry> listToDisplay ;
+	private static List<Entry> listToDisplay ;
 	private Activity currentActvity;
 	private static ListView listViewToDisplay ;
 
@@ -73,6 +76,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		// getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		// getActionBar().setCustomView(R.layout.action_bar);
+
 		mTitle = mDrawerTitle = getTitle();
 		mPlanetTitles = getResources().getStringArray(R.array.menu_item);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -304,6 +308,7 @@ public class MainActivity extends Activity {
 		    conn.setRequestProperty("Accept", "text/xml");
 		    // Starts the query
 		    conn.connect();
+		    
 		    return conn.getInputStream();
 		}
 
@@ -348,17 +353,20 @@ public class MainActivity extends Activity {
                 super.onActivityCreated(savedInstanceState);
                 int j = getArguments().getInt(ARG_PLANET_NUMBER);
                 String menuItem = getResources().getStringArray(R.array.menu_item)[j];
-                int numberOfMerchants = 15;
-        		String[] ids = new String[numberOfMerchants];
-        		for (int i = 0; i < ids.length; i++) {
+                if(menuItem.equals("Near By"))
+                {
+            		NearByModelAdapter.LoadModel(listToDisplay);
+            		String[] ids = new String[NearByModelAdapter.Items.size()];
+            		for (int i = 0; i < ids.length; i++) {
 
-        			ids[i] = Integer.toString(i + 1);
-        		}
-                NearByItemAdapter Adapter = new NearByItemAdapter(getActivity(), R.layout.merchant_list_item, ids);
-                listViewToDisplay.setAdapter(Adapter);
-            }
+            			ids[i] = Integer.toString(i + 1);
+            		}
+                    NearByItemAdapter Adapter = new NearByItemAdapter(getActivity(), R.layout.merchant_list_item, ids);
+                    listViewToDisplay.setAdapter(Adapter);
+ //                   listViewToDisplay.setOnItemClickListener(new NearByItemClickListener());
 
- 
+                }
+                            }
 
 	}
 

@@ -170,5 +170,6 @@
     <color name="MediumBlue">#0000CD</color>
     <color name="DarkBlue">#00008B</color>
     <color name="Navy">#000080</color>
-
+	<color name="Grey">#D1D3D4</color>
+	<color name="DarkGrey">#6D6E71</color>
 </resources>

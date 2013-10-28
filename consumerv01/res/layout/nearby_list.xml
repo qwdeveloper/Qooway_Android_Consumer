@@ -19,14 +19,20 @@
             android:layout_height="50dip"/>
  
     </LinearLayout>
+    
+    
+        <LinearLayout android:id="@+id/middleLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dip"
+        android:orientation ="vertical">
  
-    <!-- Title Of Song-->
-    <TextView
+ <TextView
         android:id="@+id/shopName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail"
-        android:layout_toRightOf="@+id/thumbnail"
         android:textColor="#040404"
         android:typeface="sans"
         android:textSize="15dip"
@@ -37,28 +43,28 @@
         android:id="@+id/address"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/shopName"
         android:textColor="#343434"
         android:textSize="10dip"
-        android:layout_marginTop="1dip"
-        android:layout_toRightOf="@+id/thumbnail" />
+        android:layout_marginTop="1dip"/>
     
         <TextView
-        android:id="@+id/info"
+        android:id="@+id/promotion"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/address"
         android:textSize="10dip"
-        android:layout_marginTop="1dip"
-        android:layout_toRightOf="@+id/thumbnail" />
+        android:layout_marginTop="1dip"/>
+    </LinearLayout>
+ 
+    <!-- Title Of Song-->
+    
  
     <!-- Rightend Duration -->
     <TextView
-        android:id="@+id/duration"
+        android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/shopName"
+        android:layout_alignTop="@id/middleLayout"
         android:gravity="right"
         android:text="5:45"
         android:layout_marginRight="5dip"
