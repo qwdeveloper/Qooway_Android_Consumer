@@ -52,6 +52,26 @@
         <item>Pronvice</item>
         <item>StoreID</item>
         <item>StorePicturePath</item>
+        <item>Address</item>
+        <item>AreaCode</item>
+        <item>City</item>
+        <item>Abbotsford</item>
+        <item>Canada</item>
+        <item>Id</item>
+        <item>Latitude</item>
+        <item>LogoPath</item>
+        <item>Longitude</item>
+        <item>MenuLink</item>
+        <item>Name</item>
+        <item>Neighborhood</item>
+        <item>PayOption</item>
+        <item>Phone</item>
+        <item>PostalCode</item>
+        <item>Province</item>
+        <item>Region</item>
+        <item>SpecialOffer</item>
+        <item>StoreID</item>
+        <item>Website</item>
     </string-array>
 
     <string name="drawer_open">Open navigation drawer</string>
