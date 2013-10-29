@@ -29,14 +29,10 @@ public class NearByItemAdapter extends ArrayAdapter<String>{
 	
 	public NearByItemAdapter(Context context, int textViewResourceId,
 			String[] objects) {
-
-		
 		super(context, textViewResourceId, objects);
 		this.context = context;
 		this.Ids = objects;
 		this.rowResourceId = textViewResourceId;
-
-
 	}
 
 	@Override
@@ -57,34 +53,26 @@ public class NearByItemAdapter extends ArrayAdapter<String>{
 		namePosition.setText(item.Info[0]);
 		addressPosition.setText(item.Info[1]);
 		promotionPosition.setText(item.Info[2]);
-		distancePosition.setText("Wait for GPS");
+		distancePosition.setText(item.Info[3]);
 
 		Boolean imageRecieved = false;
-		String baseUri= "http://online.profitek.com/Qooway/StorePictures/";
-		if(item.ThumbNail.equals(""))
+		DisplayImageOptions options = new DisplayImageOptions.Builder()
+        .cacheInMemory(true) 
+        .cacheOnDisc(true)
+        .build();
+		String baseUri= "http://192.168.1.55";
+		if(item.ThumbNail==null)
 		{
 			imageView.setBackgroundResource(context.getResources().getIdentifier(
 					"temp_logo", "drawable", context.getPackageName()));
 		}
 		else{
 			
-				String imageUri = baseUri +item.ThumbNail;
+		String imageUri = baseUri +item.ThumbNail;
 		ImageLoader IM = ImageLoader.getInstance();
-		IM.displayImage(imageUri, imageView); 
+		IM.displayImage(imageUri, imageView, options); 
 		}
 
-/*		String imageFile = NearByModelAdapter.GetbyId(id).IconFile;
-
-		textView.setText(NearByModelAdapter.GetbyId(id).Name);
-		// get input stream
-		InputStream ims = null;
-		try {
-			ims = context.getAssets().open(imageFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-*/
 
 		return rowView;
 

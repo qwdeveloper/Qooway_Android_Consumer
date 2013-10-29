@@ -1,16 +1,10 @@
 package com.example.consumerv01;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -18,19 +12,23 @@ import com.example.consumerv01.R;
 import com.example.consumerv01.Drawer.DrawerItemAdapter;
 import com.example.consumerv01.Drawer.DrawerModelAdapter;
 import com.example.consumerv01.R.color;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
 
 import NearBy.NearByItemAdapter;
 import NearBy.NearByModelAdapter;
-import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -41,19 +39,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity  implements
+GooglePlayServicesClient.ConnectionCallbacks,
+GooglePlayServicesClient.OnConnectionFailedListener{
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -69,7 +66,10 @@ public class MainActivity extends Activity {
 	private static List<Entry> listToDisplay ;
 	private Activity currentActvity;
 	private static ListView listViewToDisplay ;
-
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    private static Location mCurrentLocation;
+    private static LocationClient mLocationClient ;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -99,9 +99,7 @@ public class MainActivity extends Activity {
 		DrawerItemAdapter adapter = new DrawerItemAdapter(this,
 				R.layout.drawer_list_item, ids);
 		mDrawerList.setAdapter(adapter);
-
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
 		// enable ActionBar app icon to behave as action to toggle nav drawer
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
@@ -142,6 +140,11 @@ public class MainActivity extends Activity {
 		} else {
 			displayText.setText("No network connection available.");
 		}
+	       /*
+         * Create a new location client, using the enclosing class to
+         * handle callbacks.
+         */
+        mLocationClient = new LocationClient(this, this, this);
 	}
 
 	@Override
@@ -314,8 +317,111 @@ public class MainActivity extends Activity {
 
 	}
 
+//private classes
+	
+	 public static class ErrorDialogFragment extends DialogFragment {
+	        // Global field to contain the error dialog
+	        private Dialog mDialog;
+	        // Default constructor. Sets the dialog field to null
+	        public ErrorDialogFragment() {
+	            super();
+	            mDialog = null;
+	        }
+	        // Set the dialog to display
+	        public void setDialog(Dialog dialog) {
+	            mDialog = dialog;
+	        }
+	        // Return a Dialog to the DialogFragment.
+	        @Override
+	        public Dialog onCreateDialog(Bundle savedInstanceState) {
+	            return mDialog;
+	        }
+	    }
+	
+	  @Override
+	    protected void onActivityResult(
+	            int requestCode, int resultCode, Intent data) {
+	        // Decide what to do based on the original request code
+	        switch (requestCode) {
+
+	            case CONNECTION_FAILURE_RESOLUTION_REQUEST :
+	            /*
+	             * If the result code is Activity.RESULT_OK, try
+	             * to connect again
+	             */
+	                switch (resultCode) {
+	                    case Activity.RESULT_OK :
+	                    /*
+	                     * Try the request again
+	                     */
+
+	                    break;
+
+	        }
+	     }
+	  }
+	    private boolean servicesConnected() {
+	        // Check that Google Play services is available
+	        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+	        // If Google Play services is available
+	        if (ConnectionResult.SUCCESS == resultCode) {
+	            // In debug mode, log the status
+	            Log.d("Location Updates",
+	                    "Google Play services is available.");
+	            // Continue
+	            return true;
+	        // Google Play services was not available for some reason
+	        } else {
+	            // Get the error code
+	            // Get the error dialog from Google Play services
+	            Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
+	                    resultCode,
+	                    this,
+	                    CONNECTION_FAILURE_RESOLUTION_REQUEST);
+
+	            // If Google Play services can provide an error dialog
+	            if (errorDialog != null) {
+	                // Create a new DialogFragment for the error dialog
+	                ErrorDialogFragment errorFragment =
+	                        new ErrorDialogFragment();
+	                // Set the dialog in the DialogFragment
+	                errorFragment.setDialog(errorDialog);
+	                // Show the error dialog in the DialogFragment
+	                errorFragment.show(getFragmentManager(),
+	                        "Location Updates");
+	                
+	            }
+	            return false;
+	        }
+	
+	    }
+	    
+	    /*
+	     * Called when the Activity becomes visible.
+	     */
+	    @Override
+	    protected void onStart() {
+	        super.onStart();
+	        // Connect the client.
+	        mLocationClient.connect();
+
+	        
+	    }
+	    /*
+	     * Called when the Activity is no longer visible.
+	     */
+	    @Override
+	    protected void onStop() {
+	        // Disconnecting the client invalidates it.
+	        mLocationClient.disconnect();
+	        super.onStop();
+	    }
+	 
+	 
+	 
+	 
 	/**
-	 * Fragment that appears in the "content_frame", shows a planet
+	 * Fragment that appears in the "content_frame", shows a page
 	 */
 	public static class PageFragment extends Fragment {
 		public static final String ARG_PLANET_NUMBER = "planet_number";
@@ -337,7 +443,7 @@ public class MainActivity extends Activity {
 				case Login:
 					rootView = inflater.inflate(R.layout.fragment_login, container,false);
 					break;
-				case NearBy:
+				case NearBy:	       
 					rootView = inflater.inflate(R.layout.fragment_nearby, container,false);
 					listViewToDisplay = (ListView) rootView.findViewById(R.id.listView1); 
 					break;
@@ -355,7 +461,8 @@ public class MainActivity extends Activity {
                 String menuItem = getResources().getStringArray(R.array.menu_item)[j];
                 if(menuItem.equals("Near By"))
                 {
-            		NearByModelAdapter.LoadModel(listToDisplay);
+                	mCurrentLocation = mLocationClient.getLastLocation();
+            		NearByModelAdapter.LoadModel(listToDisplay , mCurrentLocation);
             		String[] ids = new String[NearByModelAdapter.Items.size()];
             		for (int i = 0; i < ids.length; i++) {
 
@@ -374,5 +481,23 @@ public class MainActivity extends Activity {
 
 		Login, Home, Search, Category, NearBy, AllDeals, CheckIn, Vouchers, Stamps, Qoopons,
 
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onConnected(Bundle connectionHint) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDisconnected() {
+		// TODO Auto-generated method stub
+		
 	}
 }

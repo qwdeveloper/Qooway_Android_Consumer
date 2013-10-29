@@ -7,28 +7,28 @@
 
     <TextView
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:background="@color/Red"
         android:gravity="center"
         android:text="@string/sign_up"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/White" />
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical" 
-            android:background="@color/DarkGrey"
-			android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp">
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@color/DarkGrey"
+        android:orientation="vertical" >
 
         <ListView
             android:id="@+id/listView1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="@color/Grey"
             android:background="@color/White"
-            android:dividerHeight="10dp">
-
+            android:divider="@color/Grey"
+            android:dividerHeight="10dp" >
         </ListView>
     </LinearLayout>
 
