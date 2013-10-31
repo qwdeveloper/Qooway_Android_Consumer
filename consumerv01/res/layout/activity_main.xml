@@ -21,7 +21,8 @@
         android:layout_gravity="start"
         android:background="@color/DarkGray"
         android:choiceMode="singleChoice"
-        android:dividerHeight="1dp" />
+        android:dividerHeight="1dp" 
+         android:divider="@color/White"/>
     
 
 

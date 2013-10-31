@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="5dip" >
+ 
+    <!--  ListRow Left side Thumbnail image -->
+    <LinearLayout android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dip">
+ 
+        <ImageView
+            android:id="@+id/list_image"
+            android:layout_width="50dip"
+            android:layout_height="50dip"/>
+ 
+    </LinearLayout>
+    
+    
+        <LinearLayout android:id="@+id/middleLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dip"
+        android:layout_marginRight="5dip"
+        android:orientation ="vertical"
+		android:layout_alignTop="@+id/thumbnail"
+        android:layout_toRightOf="@+id/thumbnail"> 
+
+ <TextView
+        android:id="@+id/shopName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:typeface="sans"
+        android:textSize="15dip"
+        android:textStyle="bold"
+        android:text ="1234"
+                android:textColor="@color/Black"/>
+ 
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10dip"
+        android:layout_marginTop="1dip"
+        android:text ="4567"
+        android:textColor="@color/DarkGrey"/>
+    
+        <TextView
+        android:id="@+id/promotion"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10dip"
+        android:layout_marginTop="1dip"
+        android:text ="99887"
+                android:textColor="@color/Red"/>
+    </LinearLayout>
+ 
+    <!-- Title Of Song-->
+    
+ 
+    <!-- Rightend Duration -->
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/middleLayout"
+        android:gravity="right"
+        android:text="Wait for GPS"
+        android:layout_marginRight="5dip"
+        android:textSize="10dip"
+        android:textColor="@color/DarkGrey"
+        android:textStyle="bold"/>
+ 
+ 
+</RelativeLayout>
