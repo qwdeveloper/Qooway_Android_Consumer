@@ -16,6 +16,7 @@ public class NearByModelAdapter {
 	public static void LoadModel(List<Entry> list , Location loc) {
 		
 		Items = new ArrayList<DisplayListItem>();
+		
 		for (Entry item : list)
 		{
 			float results[] = new float[3];

@@ -1,7 +1,6 @@
 package com.example.consumerv01;
 
 import java.io.IOException;
-
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -43,8 +42,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -56,7 +58,6 @@ public class MainActivity extends Activity implements
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
-
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
 	private String[] mPlanetTitles;
@@ -72,6 +73,9 @@ public class MainActivity extends Activity implements
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 	private static Location mCurrentLocation;
 	private static LocationClient mLocationClient;
+	private static EditText login;
+	private static EditText  password;
+	private static Button loginButton=null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -213,7 +217,7 @@ public class MainActivity extends Activity implements
 
 	private void selectItem(int position) {
 		// update the main content by replacing fragments
-		Fragment fragment = new PageFragment();
+		Fragment fragment = new PageFragment(this);
 		Bundle args = new Bundle();
 		args.putInt(PageFragment.ARG_PLANET_NUMBER, position);
 		fragment.setArguments(args);
@@ -423,11 +427,11 @@ public class MainActivity extends Activity implements
 	 */
 	public static class PageFragment extends Fragment {
 		public static final String ARG_PLANET_NUMBER = "planet_number";
+		private Activity activity = null;
+		public PageFragment(Activity Act) {
+			this.activity = Act;
 
-		public PageFragment() {
-			// Empty constructor required for fragment subclasses
 		}
-
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
@@ -441,12 +445,42 @@ public class MainActivity extends Activity implements
 			case Login:
 				rootView = inflater.inflate(R.layout.fragment_login, container,
 						false);
+				login =(EditText) rootView.findViewById(R.id.userName);
+				password =(EditText) rootView.findViewById(R.id.password);
+				loginButton = (Button) rootView.findViewById(R.id.logInButton);
+				loginButton.setOnClickListener(new  OnClickListener() {
+					 
+					@Override
+					public void onClick(View arg0) {
+		 
+					try {
+						this.login();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		 
+					}
+					private void login() throws IOException
+					{
+
+							LoginManager LIM = new LoginManager(activity);
+							LIM.connect(login.getText().toString(), password.getText().toString());
+						
+					}
+				});
+				
 				break;
 			case NearBy:
 				rootView = inflater.inflate(R.layout.fragment_nearby,
 						container, false);
 				listViewToDisplay = (ListView) rootView
 						.findViewById(R.id.listView1);
+				break;
+								
+			case Vouchers:
+				rootView = inflater.inflate(R.layout.fragment_merchant_details,
+						container, false);
 				break;
 			default:
 				rootView = inflater.inflate(R.layout.fragment_none, container,
@@ -503,4 +537,5 @@ public class MainActivity extends Activity implements
 		// TODO Auto-generated method stub
 
 	}
+	
 }

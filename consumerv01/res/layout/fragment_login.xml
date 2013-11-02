@@ -53,7 +53,7 @@
                 android:src="@drawable/login_account" />
 
             <EditText
-                android:id="@+id/editText1"
+                android:id="@+id/userName"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -76,7 +76,7 @@
                 android:src="@drawable/login_key" />
 
             <EditText
-                android:id="@+id/editText2"
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -115,13 +115,14 @@
             android:text="Remember Me" />
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/logInButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/login_button"
             android:text="Log in"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/White" />
+            android:textColor="@color/White" 
+            android:onClick = "login"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
