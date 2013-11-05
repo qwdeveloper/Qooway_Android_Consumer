@@ -61,7 +61,10 @@ public class NearByItemAdapter extends ArrayAdapter<String>{
         .cacheOnDisc(true)
         .build();
 		String baseUri= "http://192.168.1.55";
-		if(item.ThumbNail==null)
+		int o =123;
+		if(addressPosition.getText().equals("1788 West Broadway"))
+			o = 12334;
+		if(item.ThumbNail=="")
 		{
 			imageView.setBackgroundResource(context.getResources().getIdentifier(
 					"temp_logo", "drawable", context.getPackageName()));

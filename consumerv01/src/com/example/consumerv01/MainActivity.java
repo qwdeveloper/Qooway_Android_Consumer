@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -12,6 +13,7 @@ import com.example.consumerv01.R;
 import com.example.consumerv01.Drawer.DrawerItemAdapter;
 import com.example.consumerv01.Drawer.DrawerModelAdapter;
 import com.example.consumerv01.R.color;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -25,6 +27,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +37,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -60,7 +64,7 @@ public class MainActivity extends Activity implements
 	private ActionBarDrawerToggle mDrawerToggle;
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
-	private String[] mPlanetTitles;
+	private String[] mPAGETitles;
 	private String serverUrl = "http://192.168.1.96:50364";
 	private String APIUrl = "api/merchant";
 	private String stringUrl = serverUrl + "/" + APIUrl;
@@ -74,8 +78,11 @@ public class MainActivity extends Activity implements
 	private static Location mCurrentLocation;
 	private static LocationClient mLocationClient;
 	private static EditText login;
-	private static EditText  password;
-	private static Button loginButton=null;
+	private static EditText password;
+	private static Button loginButton = null;
+	public Runnable mPendingRunnable;
+	public static ProgressDialog progress;
+	private boolean fragmentChanged= false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +92,7 @@ public class MainActivity extends Activity implements
 		// getActionBar().setCustomView(R.layout.action_bar);
 
 		mTitle = mDrawerTitle = getTitle();
-		mPlanetTitles = getResources().getStringArray(R.array.menu_item);
+		mPAGETitles = getResources().getStringArray(R.array.menu_item);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		// mDrawerList.setBackgroundColor(color.Red);
@@ -123,6 +130,18 @@ public class MainActivity extends Activity implements
 				getActionBar().setTitle(mTitle);
 				invalidateOptionsMenu(); // creates call to
 											// onPrepareOptionsMenu()
+
+				if (mPendingRunnable != null) {
+					Handler mHandler = new Handler();
+					mHandler.post(mPendingRunnable);
+					mPendingRunnable = null;
+				}
+				progress = ProgressDialog.show(MainActivity.this,
+						"Downloading Data",
+						"Please wait while Data are downloaded");
+				progress.setCancelable(false);
+				progress.isIndeterminate();
+				progress.show();
 			}
 
 			public void onDrawerOpened(View drawerView) {
@@ -132,26 +151,17 @@ public class MainActivity extends Activity implements
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
 		if (savedInstanceState == null) {
 			selectItem(0);
-
 		}
-
 		currentActvity = this;
-		// code for testing HTTP / XML fetch
-		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		if (networkInfo != null && networkInfo.isConnected()) {
-			new DownloadWebpageTask().execute(stringUrl);
-		} else {
-			displayText.setText("No network connection available.");
-		}
+
 		/*
 		 * Create a new location client, using the enclosing class to handle
 		 * callbacks.
 		 */
 		mLocationClient = new LocationClient(this, this, this);
+		//mPendingRunnable.run();
 	}
 
 	@Override
@@ -189,7 +199,7 @@ public class MainActivity extends Activity implements
 		// Handle action buttons
 		switch (item.getItemId()) {
 		case R.id.search:
-			// create intent to perform web search for this planet
+			// create intent to perform web search for this PAGE
 			Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
 			intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
 			// catch event that there's no activity to handle intent
@@ -215,27 +225,40 @@ public class MainActivity extends Activity implements
 		}
 	}
 
-	private void selectItem(int position) {
+	private void selectItem(final int position) {
+		 mPendingRunnable = new Runnable() {
+		        @Override
+		        public void run() {
 		// update the main content by replacing fragments
-		Fragment fragment = new PageFragment(this);
-		Bundle args = new Bundle();
-		args.putInt(PageFragment.ARG_PLANET_NUMBER, position);
-		fragment.setArguments(args);
+			    	changeFragment(position);
+		        }
+		    };
 
-		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction()
-				.replace(R.id.content_frame, fragment).commit();
+		// update selected item and title, then close the drawer
+		// update the main content by replacing fragments
 
 		// update selected item and title, then close the drawer
 		mDrawerList.setItemChecked(position, true);
-		setTitle(mPlanetTitles[position]);
+		setTitle(mPAGETitles[position]);
 		mDrawerLayout.closeDrawer(mDrawerList);
+	}
+	
+	private void changeFragment(final int position)
+	{
+		Fragment fragment = new PageFragment(MainActivity.this);
+		Bundle args = new Bundle();
+		args.putInt(PageFragment.ARG_PAGE_NUMBER, position);
+		fragment.setArguments(args);
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+		fragmentChanged =true;
 	}
 
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
 		getActionBar().setTitle(mTitle);
+
 	}
 
 	/**
@@ -258,7 +281,7 @@ public class MainActivity extends Activity implements
 	}
 
 	/**
-	 * Fragment that appears in the "content_frame", shows a planet
+	 * Fragment that appears in the "content_frame", shows a PAGE
 	 */
 	private class DownloadWebpageTask extends
 			AsyncTask<String, Void, List<Entry>> {
@@ -281,6 +304,7 @@ public class MainActivity extends Activity implements
 		@Override
 		protected void onPostExecute(List<Entry> result) {
 			listToDisplay = result;
+			progress.cancel();
 
 		}
 
@@ -426,58 +450,68 @@ public class MainActivity extends Activity implements
 	 * Fragment that appears in the "content_frame", shows a page
 	 */
 	public static class PageFragment extends Fragment {
-		public static final String ARG_PLANET_NUMBER = "planet_number";
-		private Activity activity = null;
-		public PageFragment(Activity Act) {
-			this.activity = Act;
+		public static final String ARG_PAGE_NUMBER = "PAGE_number";
+		private MainActivity mainActivity;
 
+		public PageFragment(MainActivity MA) {
+			mainActivity = MA;
 		}
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
 
-			int i = getArguments().getInt(ARG_PLANET_NUMBER);
+			int i = getArguments().getInt(ARG_PAGE_NUMBER);
 			String menuItem = getResources().getStringArray(R.array.menu_item)[i];
 			menuItem = menuItem.replace(" ", "");
 			FragmentName name = FragmentName.valueOf(menuItem);
-			View rootView;
+			View rootView = null;
 			switch (name) {
 			case Login:
 				rootView = inflater.inflate(R.layout.fragment_login, container,
 						false);
-				login =(EditText) rootView.findViewById(R.id.userName);
-				password =(EditText) rootView.findViewById(R.id.password);
+				login = (EditText) rootView.findViewById(R.id.userName);
+				password = (EditText) rootView.findViewById(R.id.password);
 				loginButton = (Button) rootView.findViewById(R.id.logInButton);
-				loginButton.setOnClickListener(new  OnClickListener() {
-					 
+				loginButton.setOnClickListener(new OnClickListener() {
+
 					@Override
 					public void onClick(View arg0) {
-		 
-					try {
-						this.login();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-		 
-					}
-					private void login() throws IOException
-					{
 
-							LoginManager LIM = new LoginManager(activity);
-							LIM.connect(login.getText().toString(), password.getText().toString());
-						
+						try {
+							this.login();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+
+					private void login() throws IOException {
+						LoginManager LIM = new LoginManager(mainActivity);
+						LIM.connect(login.getText().toString(), password
+								.getText().toString());
 					}
 				});
-				
+
 				break;
 			case NearBy:
-				rootView = inflater.inflate(R.layout.fragment_nearby,
-						container, false);
-				listViewToDisplay = (ListView) rootView
-						.findViewById(R.id.listView1);
+				try {
+					this.mainActivity.webApiGet(this.mainActivity.serverUrl
+							+ '/' + this.mainActivity.APIUrl);
+
+					rootView = inflater.inflate(R.layout.fragment_nearby,
+							container, false);
+					listViewToDisplay = (ListView) rootView
+							.findViewById(R.id.listView1);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				break;
-								
+
 			case Vouchers:
 				rootView = inflater.inflate(R.layout.fragment_merchant_details,
 						container, false);
@@ -494,9 +528,12 @@ public class MainActivity extends Activity implements
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
-			int j = getArguments().getInt(ARG_PLANET_NUMBER);
+			int j = getArguments().getInt(ARG_PAGE_NUMBER);
 			String menuItem = getResources().getStringArray(R.array.menu_item)[j];
-			if (menuItem.equals("Near By")) {
+			menuItem = menuItem.replace(" ", "");
+			FragmentName name = FragmentName.valueOf(menuItem);
+			switch (name) {
+			case NearBy:
 				mCurrentLocation = mLocationClient.getLastLocation();
 				NearByModelAdapter.LoadModel(listToDisplay, mCurrentLocation);
 				String[] ids = new String[NearByModelAdapter.Items.size()];
@@ -508,10 +545,15 @@ public class MainActivity extends Activity implements
 				listViewToDisplay.setAdapter(Adapter);
 				// listViewToDisplay.setOnItemClickListener(new
 				// NearByItemClickListener());
+				break;
+			case Login:
+				progress.cancel();
+				break;
+			default:
 
 			}
-		}
 
+		}
 	}
 
 	public enum FragmentName {
@@ -537,5 +579,27 @@ public class MainActivity extends Activity implements
 		// TODO Auto-generated method stub
 
 	}
-	
+
+	public void webApiPost(String url) throws InterruptedException,
+			ExecutionException {
+		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		if (networkInfo != null && networkInfo.isConnected()) {
+			this.listToDisplay = new DownloadWebpageTask().execute(url).get();
+		} else {
+			displayText.setText("No network connection available.");
+		}
+	}
+
+	public void webApiGet(String url) throws InterruptedException,
+			ExecutionException {
+		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		if (networkInfo != null && networkInfo.isConnected()) {
+			this.listToDisplay = new DownloadWebpageTask().execute(url).get();
+		} else {
+			displayText.setText("No network connection available.");
+		}
+	}
+
 }
