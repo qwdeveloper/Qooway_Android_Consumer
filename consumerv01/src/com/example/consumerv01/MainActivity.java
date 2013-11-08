@@ -1,5 +1,4 @@
 package com.example.consumerv01;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -13,7 +12,6 @@ import com.example.consumerv01.R;
 import com.example.consumerv01.Drawer.DrawerItemAdapter;
 import com.example.consumerv01.Drawer.DrawerModelAdapter;
 import com.example.consumerv01.R.color;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -49,10 +47,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabContentFactory;
+import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
 import android.widget.TextView;
 
@@ -82,7 +84,8 @@ public class MainActivity extends Activity implements
 	private static Button loginButton = null;
 	public Runnable mPendingRunnable;
 	public static ProgressDialog progress;
-	private boolean fragmentChanged= false;
+	 private TabHost mTabHost;
+	 private static Entry selectedMerchant;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +93,6 @@ public class MainActivity extends Activity implements
 		setContentView(R.layout.activity_main);
 		// getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		// getActionBar().setCustomView(R.layout.action_bar);
-
 		mTitle = mDrawerTitle = getTitle();
 		mPAGETitles = getResources().getStringArray(R.array.menu_item);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -102,14 +104,12 @@ public class MainActivity extends Activity implements
 		String[] mMenuItem = getResources().getStringArray(R.array.menu_item);
 		String[] mMenuItemFiles = getResources().getStringArray(
 				R.array.menu_item_image_name);
-
 		DrawerModelAdapter.LoadModel(mMenuItem, mMenuItemFiles);
 		String[] ids = new String[DrawerModelAdapter.Items.size()];
 		for (int i = 0; i < ids.length; i++) {
 
 			ids[i] = Integer.toString(i + 1);
 		}
-
 		DrawerItemAdapter adapter = new DrawerItemAdapter(this,
 				R.layout.drawer_list_item, ids);
 		mDrawerList.setAdapter(adapter);
@@ -155,13 +155,13 @@ public class MainActivity extends Activity implements
 			selectItem(0);
 		}
 		currentActvity = this;
-
 		/*
 		 * Create a new location client, using the enclosing class to handle
 		 * callbacks.
 		 */
 		mLocationClient = new LocationClient(this, this, this);
 		//mPendingRunnable.run();
+		changeFragment(0);
 	}
 
 	@Override
@@ -251,7 +251,6 @@ public class MainActivity extends Activity implements
 		fragment.setArguments(args);
 		FragmentManager fragmentManager = getFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-		fragmentChanged =true;
 	}
 
 	@Override
@@ -342,7 +341,6 @@ public class MainActivity extends Activity implements
 			conn.setRequestProperty("Accept", "text/xml");
 			// Starts the query
 			conn.connect();
-
 			return conn.getInputStream();
 		}
 
@@ -452,11 +450,12 @@ public class MainActivity extends Activity implements
 	public static class PageFragment extends Fragment {
 		public static final String ARG_PAGE_NUMBER = "PAGE_number";
 		private MainActivity mainActivity;
-
+		private View rootView ;
 		public PageFragment(MainActivity MA) {
 			mainActivity = MA;
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
@@ -465,7 +464,7 @@ public class MainActivity extends Activity implements
 			String menuItem = getResources().getStringArray(R.array.menu_item)[i];
 			menuItem = menuItem.replace(" ", "");
 			FragmentName name = FragmentName.valueOf(menuItem);
-			View rootView = null;
+			
 			switch (name) {
 			case Login:
 				rootView = inflater.inflate(R.layout.fragment_login, container,
@@ -513,8 +512,13 @@ public class MainActivity extends Activity implements
 				break;
 
 			case Vouchers:
-				rootView = inflater.inflate(R.layout.fragment_merchant_details,
-						container, false);
+				rootView = inflater.inflate(R.layout.fragment_merchant_details,container, false);
+				mainActivity.mTabHost= (TabHost)rootView.findViewById(android.R.id.tabhost);	 
+				mainActivity.mTabHost.setup();
+		 	    setupTab( inflater, container,  new TextView(rootView.getContext()), "Check-ins");
+		 	    setupTab( inflater,container,new TextView(rootView.getContext()), "Store Profile");
+		 	    setupTab(inflater,container,new TextView(rootView.getContext()), "Reviews");
+		 	    setupTab( inflater,container,new TextView(rootView.getContext()), "Menu");
 				break;
 			default:
 				rootView = inflater.inflate(R.layout.fragment_none, container,
@@ -522,9 +526,42 @@ public class MainActivity extends Activity implements
 				break;
 			}
 			return rootView;
-
 		}
 
+		private void setupTab(final LayoutInflater inflater, final ViewGroup container,final View view, final String tag) {
+			    View tabview = createTabView(mainActivity.mTabHost.getContext(), tag);
+			    TabSpec setContent =mainActivity.mTabHost.newTabSpec(tag).setIndicator(tabview);
+			    		setContent.setContent(new TabContentFactory() {
+			        public View createTabContent(String tag) {
+			        	if(tag.equals("Store Profile"))
+			        	{
+			        		 View individualTabview = inflater.inflate(R.layout.store_profile,container, false);
+			        		 TextView merchantname = (TextView) individualTabview.findViewById(R.id.merchantName);
+			        		 TextView address = (TextView) individualTabview.findViewById(R.id.address);
+			        		 TextView info= (TextView) individualTabview.findViewById(R.id.info);
+			        		 
+			        		 String name =selectedMerchant.name;
+			        		 String Add =(String)selectedMerchant.info.get("Address");
+			        		 String PO=(String)selectedMerchant.info.get("PayOption");
+			        		 
+			        		 merchantname.setText(name);
+			        		 address.setText(Add);
+			        		 info.setText(PO);
+			        		 return individualTabview ;
+			        	}
+			        	else
+			        		return view;
+			        }
+			    });
+
+			    mainActivity.mTabHost.addTab(setContent);
+			}
+		private static View createTabView(final Context context, final String text) {
+		    View view = LayoutInflater.from(context).inflate(R.layout.tabs_bg, null);
+		    TextView tv = (TextView) view.findViewById(R.id.tabsText);
+		    tv.setText(text);
+		    return view;
+		}
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
@@ -543,14 +580,26 @@ public class MainActivity extends Activity implements
 				NearByItemAdapter Adapter = new NearByItemAdapter(
 						getActivity(), R.layout.merchant_list_item, ids);
 				listViewToDisplay.setAdapter(Adapter);
-				// listViewToDisplay.setOnItemClickListener(new
-				// NearByItemClickListener());
+				listViewToDisplay.setOnItemClickListener(new OnItemClickListener() {
+					  @Override
+					  public void onItemClick(AdapterView<?> parent, View view,
+					    int position, long id) {
+					    Toast.makeText(mainActivity.getApplicationContext(),
+					      "Click ListItem Number " + position, Toast.LENGTH_LONG)
+					      .show();
+					    selectedMerchant =listToDisplay.get(position);
+					    mainActivity.changeFragment(7);
+					  }
+					}); 
+
 				break;
 			case Login:
-				progress.cancel();
 				break;
 			default:
-
+				
+				if(progress!=null)
+					progress.cancel();
+				break;
 			}
 
 		}
