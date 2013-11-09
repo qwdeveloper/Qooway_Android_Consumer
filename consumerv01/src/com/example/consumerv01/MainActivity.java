@@ -1,5 +1,7 @@
 package com.example.consumerv01;
+
 import java.io.IOException;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -20,6 +22,7 @@ import com.google.android.gms.location.LocationClient;
 import Login.LoginManager;
 import NearBy.NearByItemAdapter;
 import NearBy.NearByModelAdapter;
+import android.R.integer;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -39,6 +42,7 @@ import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,6 +54,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TabHost;
@@ -84,8 +90,8 @@ public class MainActivity extends Activity implements
 	private static Button loginButton = null;
 	public Runnable mPendingRunnable;
 	public static ProgressDialog progress;
-	 private TabHost mTabHost;
-	 private static Entry selectedMerchant;
+	private TabHost mTabHost;
+	private static Entry selectedMerchant;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +166,7 @@ public class MainActivity extends Activity implements
 		 * callbacks.
 		 */
 		mLocationClient = new LocationClient(this, this, this);
-		//mPendingRunnable.run();
+		// mPendingRunnable.run();
 		changeFragment(0);
 	}
 
@@ -226,13 +232,13 @@ public class MainActivity extends Activity implements
 	}
 
 	private void selectItem(final int position) {
-		 mPendingRunnable = new Runnable() {
-		        @Override
-		        public void run() {
-		// update the main content by replacing fragments
-			    	changeFragment(position);
-		        }
-		    };
+		mPendingRunnable = new Runnable() {
+			@Override
+			public void run() {
+				// update the main content by replacing fragments
+				changeFragment(position);
+			}
+		};
 
 		// update selected item and title, then close the drawer
 		// update the main content by replacing fragments
@@ -242,15 +248,15 @@ public class MainActivity extends Activity implements
 		setTitle(mPAGETitles[position]);
 		mDrawerLayout.closeDrawer(mDrawerList);
 	}
-	
-	private void changeFragment(final int position)
-	{
+
+	private void changeFragment(final int position) {
 		Fragment fragment = new PageFragment(MainActivity.this);
 		Bundle args = new Bundle();
 		args.putInt(PageFragment.ARG_PAGE_NUMBER, position);
 		fragment.setArguments(args);
 		FragmentManager fragmentManager = getFragmentManager();
-		fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content_frame, fragment).commit();
 	}
 
 	@Override
@@ -450,7 +456,8 @@ public class MainActivity extends Activity implements
 	public static class PageFragment extends Fragment {
 		public static final String ARG_PAGE_NUMBER = "PAGE_number";
 		private MainActivity mainActivity;
-		private View rootView ;
+		private View rootView;
+
 		public PageFragment(MainActivity MA) {
 			mainActivity = MA;
 		}
@@ -464,7 +471,7 @@ public class MainActivity extends Activity implements
 			String menuItem = getResources().getStringArray(R.array.menu_item)[i];
 			menuItem = menuItem.replace(" ", "");
 			FragmentName name = FragmentName.valueOf(menuItem);
-			
+
 			switch (name) {
 			case Login:
 				rootView = inflater.inflate(R.layout.fragment_login, container,
@@ -512,13 +519,19 @@ public class MainActivity extends Activity implements
 				break;
 
 			case Vouchers:
-				rootView = inflater.inflate(R.layout.fragment_merchant_details,container, false);
-				mainActivity.mTabHost= (TabHost)rootView.findViewById(android.R.id.tabhost);	 
+				rootView = inflater.inflate(R.layout.fragment_merchant_details,
+						container, false);
+				mainActivity.mTabHost = (TabHost) rootView
+						.findViewById(android.R.id.tabhost);
 				mainActivity.mTabHost.setup();
-		 	    setupTab( inflater, container,  new TextView(rootView.getContext()), "Check-ins");
-		 	    setupTab( inflater,container,new TextView(rootView.getContext()), "Store Profile");
-		 	    setupTab(inflater,container,new TextView(rootView.getContext()), "Reviews");
-		 	    setupTab( inflater,container,new TextView(rootView.getContext()), "Menu");
+				setupTab(inflater, container,
+						new TextView(rootView.getContext()), "Check-Ins");
+				setupTab(inflater, container,
+						new TextView(rootView.getContext()), "Store Profile");
+				setupTab(inflater, container,
+						new TextView(rootView.getContext()), "Reviews");
+				setupTab(inflater, container,
+						new TextView(rootView.getContext()), "Menu");
 				break;
 			default:
 				rootView = inflater.inflate(R.layout.fragment_none, container,
@@ -528,40 +541,303 @@ public class MainActivity extends Activity implements
 			return rootView;
 		}
 
-		private void setupTab(final LayoutInflater inflater, final ViewGroup container,final View view, final String tag) {
-			    View tabview = createTabView(mainActivity.mTabHost.getContext(), tag);
-			    TabSpec setContent =mainActivity.mTabHost.newTabSpec(tag).setIndicator(tabview);
-			    		setContent.setContent(new TabContentFactory() {
-			        public View createTabContent(String tag) {
-			        	if(tag.equals("Store Profile"))
-			        	{
-			        		 View individualTabview = inflater.inflate(R.layout.store_profile,container, false);
-			        		 TextView merchantname = (TextView) individualTabview.findViewById(R.id.merchantName);
-			        		 TextView address = (TextView) individualTabview.findViewById(R.id.address);
-			        		 TextView info= (TextView) individualTabview.findViewById(R.id.info);
-			        		 
-			        		 String name =selectedMerchant.name;
-			        		 String Add =(String)selectedMerchant.info.get("Address");
-			        		 String PO=(String)selectedMerchant.info.get("PayOption");
-			        		 
-			        		 merchantname.setText(name);
-			        		 address.setText(Add);
-			        		 info.setText(PO);
-			        		 return individualTabview ;
-			        	}
-			        	else
-			        		return view;
-			        }
-			    });
+		private void setupTab(final LayoutInflater inflater,
+				final ViewGroup container, final View view, final String tag) {
+			View tabview = createTabView(mainActivity.mTabHost.getContext(),
+					tag);
+			TabSpec setContent = mainActivity.mTabHost.newTabSpec(tag)
+					.setIndicator(tabview);
+			setContent.setContent(new TabContentFactory() {
+				public View createTabContent(String tag) {
+					String switchName = tag;
+					switchName = switchName.replace("-", "");
+					switchName = switchName.replace(" ", "");
+					Merchant_Details_Pages name = Merchant_Details_Pages
+							.valueOf(switchName);
+					View individualTabview = view;
+					switch (name) {
+					case CheckIns:
+						individualTabview = inflater.inflate(
+								R.layout.check_ins, container, false);
+						break;
+					case StoreProfile:
+						individualTabview = inflater.inflate(
+								R.layout.store_profile, container, false);
+						if (selectedMerchant != null) {
 
-			    mainActivity.mTabHost.addTab(setContent);
-			}
-		private static View createTabView(final Context context, final String text) {
-		    View view = LayoutInflater.from(context).inflate(R.layout.tabs_bg, null);
-		    TextView tv = (TextView) view.findViewById(R.id.tabsText);
-		    tv.setText(text);
-		    return view;
+							final ImageButton favoriteMerchant = (ImageButton) individualTabview
+									.findViewById(R.id.imageButton1);
+							favoriteMerchant
+									.setOnClickListener(new OnClickListener() {
+										@Override
+										public void onClick(View arg0) {
+
+											favoriteMerchant
+													.setImageResource(mainActivity
+															.getResources()
+															.getIdentifier(
+																	"merchantdetails_favorite_yes",
+																	"drawable",
+																	mainActivity
+																			.getApplicationContext()
+																			.getPackageName()));
+										}
+									});
+
+							final ImageButton earnQooPoints = (ImageButton) individualTabview
+									.findViewById(R.id.imageButton2);
+							earnQooPoints
+									.setOnClickListener(new OnClickListener() {
+										@Override
+										public void onClick(View arg0) {
+
+											earnQooPoints
+													.setImageResource(mainActivity
+															.getResources()
+															.getIdentifier(
+																	"merchantdetails_earnqoopoints_yes",
+																	"drawable",
+																	mainActivity
+																			.getApplicationContext()
+																			.getPackageName()));
+										}
+									});
+							TextView merchantname = (TextView) individualTabview
+									.findViewById(R.id.merchantName);
+							TextView addressSmall = (TextView) individualTabview
+									.findViewById(R.id.address);
+							TextView addressBig = (TextView) individualTabview
+									.findViewById(R.id.addressBigger);
+							TextView features = (TextView) individualTabview
+									.findViewById(R.id.description);
+							TextView hours = (TextView) individualTabview
+									.findViewById(R.id.hours);
+							TextView phone = (TextView) individualTabview
+									.findViewById(R.id.phoneField);
+							TextView website = (TextView) individualTabview
+									.findViewById(R.id.webSiteField);
+							TextView additionalInfo = (TextView) individualTabview
+									.findViewById(R.id.additionalInfo);
+
+							String hoursOfOperation = "";
+							for (int i = 1; i < 7; i++) {
+								String openclosother = "OpenClosOther";
+								String key = openclosother + i;
+								String value = (String) selectedMerchant.info
+										.get(key);
+								if (value != null) {
+									if (i != 1 && !value.equals(""))
+										hoursOfOperation += "\n";
+									hoursOfOperation += value;
+								}
+
+							}
+
+							String BiggerAddress = (String) selectedMerchant.info
+									.get("City")
+									+ ", "
+									+ (String) selectedMerchant.info
+											.get("Province")
+									+ ", "
+									+ (String) selectedMerchant.info
+											.get("PostalCode");
+							String Phone = "("
+									+ (String) selectedMerchant.info
+											.get("AreaCode")
+									+ ")"
+									+ (String) selectedMerchant.info
+											.get("Phone");
+							String MerchantType = (String) selectedMerchant.info
+									.get("MerchantType");
+							if (MerchantType.equals("R")) {
+
+							} else if (MerchantType.equals("T")) {
+
+							}
+							merchantname.setText(selectedMerchant.name);
+							addressSmall.setText((String) selectedMerchant.info
+									.get("Address"));
+							addressBig.setText(BiggerAddress);
+							phone.setText(Phone);
+							hours.setText(hoursOfOperation);
+							String s_features = (String) selectedMerchant.info
+									.get("OtherInfo");
+							features.setText(Html.fromHtml(s_features));
+							website.setText((String) selectedMerchant.info
+									.get("Website"));
+							int PriceLegend = Integer
+									.parseInt((String) selectedMerchant.info
+											.get("PriceLegend"));
+							int Score = Integer
+									.parseInt((String) selectedMerchant.info
+											.get("Score"));
+							setUpPriceLegend(PriceLegend, inflater, container,
+									individualTabview);
+							setUpScore(Score, inflater, container,
+									individualTabview);
+						}
+						break;
+					case Reviews:
+						individualTabview = inflater.inflate(R.layout.reviews,
+								container, false);
+						break;
+					case Menu:
+						individualTabview = inflater.inflate(R.layout.menu,
+								container, false);
+						break;
+					default:
+					}
+					return individualTabview;
+				}
+			});
+			mainActivity.mTabHost.addTab(setContent);
 		}
+
+		private void setUpPriceLegend(int priceLegend,
+				final LayoutInflater inflater, final ViewGroup container,
+				final View view) {
+			switch (priceLegend) {
+			case 2:
+				break;
+			case 3:
+				setPicture(view, R.id.imageView6,
+						"merchantdetails_money_green_middle");
+				break;
+			case 4:
+				setPicture(view, R.id.imageView6,
+						"merchantdetails_money_green_middle");
+				setPicture(view, R.id.imageView7,
+						"merchantdetails_money_green_middle");
+				break;
+			case 5:
+				setPicture(view, R.id.imageView6,
+						"merchantdetails_money_green_middle");
+				setPicture(view, R.id.imageView7,
+						"merchantdetails_money_green_middle");
+				setPicture(view, R.id.imageView7,
+						"merchantdetails_money_green_right");
+				break;
+			default:
+				break;
+			}
+		}
+
+		private void setUpScore(int score, final LayoutInflater inflater,
+				final ViewGroup container, final View view) {
+			switch (score) {
+			case 0:
+				break;
+			case 1:
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_left_halfstar");
+				break;
+			case 2:
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+
+				break;
+			case 3:
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_halfstar");
+				break;
+			case 4:
+
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_yellow_middle");
+
+				break;
+			case 5:
+
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView11,
+						"merchantdetails_starrating_halfstar");
+
+			case 6:
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView11,
+						"merchantdetails_starrating_yellow_middle");
+
+				break;
+			case 7:
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView11,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView12,
+						"merchantdetails_starrating_halfstar");
+				break;
+			case 8:
+
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView11,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView12,
+						"merchantdetails_starrating_yellow_middle");
+
+				break;
+			case 9:
+
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView11,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView12,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView13,
+						"merchantdetails_starrating_right_halfstar");
+				break;
+			case 10:
+
+				setPicture(view, R.id.imageView9,
+						"merchantdetails_starrating_yellow_left");
+				setPicture(view, R.id.imageView10,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView11,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView12,
+						"merchantdetails_starrating_yellow_middle");
+				setPicture(view, R.id.imageView13,
+						"merchantdetails_starrating_yellow_right");
+
+				break;
+			default:
+				break;
+			}
+		}
+
+		private void setPicture(View parent, int id, String picture) {
+			ImageView IV = (ImageView) parent.findViewById(id);
+			IV.setImageResource(this.getResources().getIdentifier(picture,
+					"drawable",
+					mainActivity.getApplicationContext().getPackageName()));
+		}
+
+		private static View createTabView(final Context context,
+				final String text) {
+			View view = LayoutInflater.from(context).inflate(R.layout.tabs_bg,
+					null);
+			TextView tv = (TextView) view.findViewById(R.id.tabsText);
+			tv.setText(text);
+			return view;
+		}
+
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
@@ -580,29 +856,34 @@ public class MainActivity extends Activity implements
 				NearByItemAdapter Adapter = new NearByItemAdapter(
 						getActivity(), R.layout.merchant_list_item, ids);
 				listViewToDisplay.setAdapter(Adapter);
-				listViewToDisplay.setOnItemClickListener(new OnItemClickListener() {
-					  @Override
-					  public void onItemClick(AdapterView<?> parent, View view,
-					    int position, long id) {
-					    Toast.makeText(mainActivity.getApplicationContext(),
-					      "Click ListItem Number " + position, Toast.LENGTH_LONG)
-					      .show();
-					    selectedMerchant =listToDisplay.get(position);
-					    mainActivity.changeFragment(7);
-					  }
-					}); 
-
+				listViewToDisplay
+						.setOnItemClickListener(new OnItemClickListener() {
+							@Override
+							public void onItemClick(AdapterView<?> parent,
+									View view, int position, long id) {
+								Toast.makeText(
+										mainActivity.getApplicationContext(),
+										"Click ListItem Number " + position,
+										Toast.LENGTH_LONG).show();
+								selectedMerchant = listToDisplay.get(position);
+								mainActivity.changeFragment(7);
+							}
+						});
 				break;
 			case Login:
 				break;
 			default:
-				
-				if(progress!=null)
+				if (progress != null)
 					progress.cancel();
 				break;
 			}
-
 		}
+	}
+
+	public enum Merchant_Details_Pages {
+
+		CheckIns, StoreProfile, Reviews, Menu
+
 	}
 
 	public enum FragmentName {

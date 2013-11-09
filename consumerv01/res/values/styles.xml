@@ -29,7 +29,7 @@
     <style name="MyTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">@color/White</item>
     </style>
-
+ <color name="DarkGrayTwo">#A0A0A0</color>
     <color name="Blue">#242A34</color>
     <color name="Red">#DA563F</color>
     <color name="Orange">#F29E37</color>
